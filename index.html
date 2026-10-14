@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>سباق العودة إلى نون</title>
+<style>
+:root{--g:#075548;--mint:#dcf5e9;--gold:#f6bd38;--ink:#173c39;--paper:#fffdf7}
+*{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial,sans-serif;color:var(--ink);background:linear-gradient(145deg,#f4fff9,#fff8e7)}
+header{background:var(--g);color:white;text-align:center;padding:25px 15px 28px;border-radius:0 0 30px 30px}
+.logo{font-size:19px;color:#baf1d9;font-weight:bold}h1{font-size:clamp(26px,5vw,38px);margin:12px 0 8px}header p{line-height:1.9;max-width:700px;margin:auto}
+main{max-width:850px;margin:18px auto;padding:0 13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat,.panel{background:white;border:1px solid #d5eae0;border-radius:18px;padding:15px;box-shadow:0 6px 20px #0755480b}.stat{text-align:center;font-size:13px}.num{display:block;color:var(--g);font-size:26px;font-weight:bold;margin-top:5px}
+.panel{margin-top:14px}.panel h2{color:var(--g);font-size:21px;margin:0 0 10px}.intro{line-height:1.9}.track{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0}.station{border:2px solid #d7e9e0;border-radius:15px;background:#f8fffb;text-align:center;padding:13px 5px;min-height:106px}.station.locked{opacity:.55;filter:grayscale(.35)}.station.done{border-color:#29a87e;background:#e3f8ed}.station .ico{font-size:27px}.station b{display:block;margin:6px 0 3px}.station small{font-size:11px}
+button{font-family:inherit;font-size:15px;font-weight:bold;border:0;border-radius:12px;padding:12px 15px;cursor:pointer}.primary{background:var(--g);color:white}.gold{background:var(--gold);color:#173c39}.light{background:var(--mint);color:var(--g)}button:disabled{opacity:.45;cursor:not-allowed}
+label{display:block;font-weight:bold;margin:12px 0 7px}input{width:100%;font:inherit;border:1px solid #c7dfd3;border-radius:11px;padding:13px;background:#fbfffd}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.challenge{background:#fff8df;border:1px solid #f0d889;border-radius:15px;padding:15px;line-height:1.9;margin-top:13px}.hidden{display:none}.code{font-size:20px;letter-spacing:3px;color:var(--g);font-weight:bold;background:#e8f8ee;padding:10px;border-radius:10px;display:inline-block;margin:8px 0}.progress{height:12px;background:#e6eee9;border-radius:99px;overflow:hidden;margin:12px 0}.bar{height:100%;width:0;background:linear-gradient(90deg,#31a87f,#f6bd38);transition:width .3s}.note{font-size:13px;color:#55736b;line-height:1.9}.message{font-weight:bold;color:var(--g);line-height:1.8}.medal{font-size:36px}
+@media(max-width:560px){.track{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:1fr 1fr}.station:last-child{grid-column:span 2}}
+@media print{button,input{display:none}.panel,.stat{box-shadow:none}}
+</style></head>
+<body>
+<header><div class="logo">● نــون | رحاب المعرفة</div><h1>🏁 سباق العودة إلى نون</h1><p>حلّي التدريب أولًا، خذي رمز المرحلة من معلمتك، ثم ارجعي وافتحي المفاجأة! كل تدريب تنجزينه يقرّبك من كأس بطلات نون. 🌟</p></header>
+<main>
+<section class="stats">
+<div class="stat">⭐ مجموع النجوم<span class="num" id="points">0</span></div>
+<div class="stat">🔓 مراحل مفتوحة<span class="num" id="levels">0 / 5</span></div>
+<div class="stat">🏆 لقبك<span class="num" id="rank" style="font-size:17px">متسابقة نون</span></div>
+</section>
+<section class="panel">
+<h2>🎯 كيف تلعبين؟</h2><div class="intro">١. افتحي المرحلة الحالية واقرئي التدريب المطلوب.<br>٢. انتقلي إلى منصة التدريبات وحلّي المطلوب كاملًا.<br>٣. بعد التحقق من إنجازك، تمنحك المعلمة رمز المرحلة.<br>٤. عودي إلى اللعبة وأدخلي الرمز لفتح المفاجأة والانتقال إلى المرحلة التالية.</div>
+<div class="progress"><div class="bar" id="bar"></div></div><div class="note" id="progressText">ابدئي المرحلة الأولى!</div>
+<div class="track" id="track"></div>
+</section>
+<section class="panel">
+<h2 id="stageTitle">🔐 المرحلة الأولى</h2><div id="stageDesc" class="intro">اضغطي على المرحلة الأولى لعرض المطلوب.</div>
+<div id="entry">
+<label for="codeInput">رمز العودة من المعلمة</label><input id="codeInput" placeholder="اكتبي الرمز الذي حصلتِ عليه" autocomplete="off">
+<div class="actions"><button class="primary" onclick="unlock()">فتح المرحلة ⭐</button><button class="light" onclick="showTask()">عرض التدريب المطلوب</button></div>
+</div>
+<div id="reward" class="challenge hidden"></div>
+</section>
+<section class="panel">
+<h2>👑 لوحة بطلات نون</h2><div class="medal">🌟 💚 🏆</div><p class="message" id="cheer">كل تدريب تنجزينه هو خطوة نحو التميز. لا تتوقفي!</p>
+<button class="gold" onclick="copyProgress()">نسخ ملخص إنجازي</button> <button class="light" onclick="resetGame()">إعادة اللعبة</button>
+</section>
+</main><footer style="text-align:center;padding:20px;color:#52776b">معًا نصنع التميز — نون 🌱</footer>
+<script>
+const stages=[
+ {name:"الانطلاق",icon:"🚦",task:"أنجزي التدريب الأول في المنصة، ثم عودي بالرمز الذي تمنحك إياه المعلمة.",hash:"a6308ff281729ec0b1f280a91f54497a7a40fb0e3e23ddb55050dc543b573d8d",reward:"+10 نجوم",points:10,cheer:"انطلاقة قوية! بطلة نون بدأت السباق!"},
+ {name:"تحدي التركيز",icon:"🧠",task:"أكملي التدريب الثاني، وراجعي إجاباتك قبل طلب رمز المرحلة.",hash:"1104e76dcb8c227092144d2b271f25e9858348270cb8f88c5ef33ff8f39b1d92",reward:"+15 نجمة",points:15,cheer:"رائعة! تركيزك يفتح لك الطريق نحو القمة."},
+ {name:"سرعة الإنجاز",icon:"⚡",task:"أكملي التدريب الثالث بإتقان، ثم اطلبي رمز العودة من المعلمة.",hash:"57db7e163b9f4bb7e3ffac95b0ee7e4b95ddbd71e4eb4cbfa4eaebf66bb6b57d",reward:"فرصة ذهبية +20 نجمة",points:20,cheer:"إنجاز جديد! سرعتك مع الدقة تصنع الفرق."},
+ {name:"المثابرة",icon:"💎",task:"أنجزي التدريب الرابع، وإذا أخطأتِ فحاولي مرة أخرى حتى تتقنيه.",hash:"9cfb305842dc0f4c935ee5bbd9a263303668f44d8583d73504ef53f2c96c4491",reward:"+25 نجمة",points:25,cheer:"المثابرة سر التميز، وأنتِ تثبتين ذلك!"},
+ {name:"كأس نون",icon:"🏆",task:"أكملي التدريب الأخير وأظهري للمعلمة إنجازك لتحصلي على الرمز النهائي.",hash:"df4fbef06dc95bf1df835a6b0cfa0b86a02b66d9fb7d206f6630f9a777f525c5",reward:"كأس بطلة نون +30 نجمة",points:30,cheer:"يا بطلة! وصلتِ إلى خط النهاية واستحققتِ كأس نون!"}
+];
+let current=0,opened=new Set(),points=0;
+
+async function sha256(str){
+ const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str));
+ return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function renderTrack(){
+ const t=document.getElementById("track");t.innerHTML="";
+ stages.forEach((s,i)=>{
+  let d=document.createElement("button");
+  d.className="station "+(opened.has(i)?"done":i>current?"locked":"");
+  const isUnlocked=opened.has(i)||i===current;
+  d.innerHTML=`<span class="ico">${opened.has(i)?"✅":(isUnlocked?s.icon:"🔒")}</span><b>${isUnlocked?s.name:"مرحلة مقفلة"}</b><small>${opened.has(i)?"مكتملة":i===current?"المرحلة الحالية":"مقفلة 🔒"}</small>`;
+  d.onclick=()=>selectStage(i);
+  d.disabled=i>current&&!opened.has(i);
+  t.appendChild(d)
+ });
+ document.getElementById("points").textContent=points;
+ document.getElementById("levels").textContent=`${opened.size} / 5`;
+ document.getElementById("bar").style.width=(opened.size/5*100)+"%";
+ document.getElementById("progressText").textContent=`أنجزتِ ${opened.size} من 5 مراحل`;
+ document.getElementById("rank").textContent=opened.size===5?"بطلة نون 👑":points>=25?"نجمة متألقة ✨":points>=10?"متسابقة نشيطة 🌟":"متسابقة نون";
+ document.getElementById("cheer").textContent=opened.size===5?"🎉 "+stages[4].cheer:stages[Math.min(current,4)].cheer
+}
+
+function selectStage(i){
+ current=i;
+ const stageNum = ["الأولى","الثانية","الثالثة","الرابعة","الخامسة"][i];
+ document.getElementById("stageTitle").textContent=stages[i].icon+" المرحلة "+stageNum+": "+stages[i].name;
+ document.getElementById("stageDesc").textContent=stages[i].task;
+ document.getElementById("codeInput").value="";
+ document.getElementById("reward").classList.add("hidden");
+ if(opened.has(i)){
+  document.getElementById("reward").classList.remove("hidden");
+  document.getElementById("reward").innerHTML="✅ هذه المرحلة مكتملة بالفعل! "+stages[i].reward
+ }
+ renderTrack()
+}
+
+function showTask(){
+ document.getElementById("stageDesc").textContent="📚 المطلوب: "+stages[current].task+" بعد الإنجاز ارجعي إلى هنا وأدخلي الرمز الذي تمنحك إياه المعلمة."
+}
+
+async function unlock(){
+ if(opened.has(current)){alert("هذه المرحلة مكتملة! اختاري المرحلة التالية.");return}
+ let val=document.getElementById("codeInput").value.trim().toUpperCase();
+ let hashedVal=await sha256(val);
+ if(hashedVal!==stages[current].hash){
+  alert("الرمز غير صحيح بعد. أنجزي التدريب أولًا وخذي الرمز من المعلمة 💚");
+  return
+ }
+ opened.add(current);
+ points+=stages[current].points;
+ let r=document.getElementById("reward");
+ r.classList.remove("hidden");
+ r.innerHTML=`<div class="medal">🎉 ${stages[current].icon}</div><strong>أحسنتِ! فتحتِ ${stages[current].name}</strong><p>مكافأتك: <span class="code">${stages[current].reward}</span></p><p>${stages[current].cheer}</p>`;
+ if(current<4)current++;
+ renderTrack();
+ if(opened.size<5)selectStage(current);
+ else{
+  document.getElementById("stageTitle").textContent="🏆 اكتمل سباق نون!";
+  document.getElementById("stageDesc").textContent="مبارك! أنجزتِ التدريبات الخمسة وبلغتِ خط النهاية."
+ }
+}
+
+function copyProgress(){
+ let txt="سباق العودة إلى نون\nالإنجاز: "+opened.size+"/5 مراحل\nالنجوم: "+points+"\nاللقب: "+document.getElementById("rank").textContent;
+ let ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();
+ try{document.execCommand("copy");alert("تم نسخ ملخص الإنجاز")}catch(e){alert(txt)}ta.remove()
+}
+
+function resetGame(){
+ if(!confirm("إعادة اللعبة من البداية؟"))return;
+ current=0;opened=new Set();points=0;selectStage(0);renderTrack()
+}
+
+selectStage(0);renderTrack();
+</script></body></html>
